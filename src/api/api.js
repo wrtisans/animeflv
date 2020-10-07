@@ -498,7 +498,7 @@ const latestAnimeAdded = async() =>{
     const poster = BASE_URL + $element.find('a div.Image figure img').attr('src');
     const banner = poster.replace('covers' , 'banners').trim();
     const type = $element.find('div.Description p span.Type').text();
-    const synopsis = $element.find('div.Description p').text().trim();
+    const synopsis = $element.find('div.Description p').last().text().trim();
     const rating = $element.find('div.Description p span.Vts').text();
     const debut = $element.find('a span.Estreno').text().toLowerCase();
     promises.push(animeEpisodesHandler(id).then(async extra => ({

@@ -4,8 +4,8 @@ const cloudscraper = require('cloudscraper');
 const decodeURL = require('urldecode')
 const {MergeRecursive , urlify , decodeZippyURL , imageUrlToBase64} = require('../utils/index');
 const {
-  BASE_URL         , SEARCH_URL             , BROWSE_URL , 
-  ANIME_VIDEO_URL  , BASE_EPISODE_IMG_URL   , 
+  BASE_URL         , SEARCH_URL             , BROWSE_URL ,
+  ANIME_VIDEO_URL  , BASE_EPISODE_IMG_URL   ,
   BASE_JIKA_URL    , BASE_MYANIME_LIST_URL
 } = require('./urls');
 
@@ -21,7 +21,7 @@ const animeExtraInfo = async(title) =>{
   const data = await cloudscraper.get(animeDetails);
   const body = Array(JSON.parse(data));
   const promises = [];
-  
+
   body.map(doc =>{
     promises.push({
       titleJapanese: doc.title_japanese,
@@ -31,7 +31,7 @@ const animeExtraInfo = async(title) =>{
       aired:{
         from: doc.aired.from,
         to: doc.aired.to,
-        string: doc.aired.string  
+        string: doc.aired.string
       },
       duration: doc.duration,
       rank: doc.rank,
@@ -65,16 +65,16 @@ const downloadLinksByEpsId = async(id) =>{
   let tempServerNames = $('table.RTbl').parsetable(true , true , true)[0];
   let serverNames = tempServerNames.filter(x => x !== 'SERVIDOR');
   let urls = [];
-  
+
   try{
     const table = $('table.RTbl').html();
     const data = await urlify(table).then(res => { return res; });
-    const tempUrls = [];  
+    const tempUrls = [];
     data.map(baseUrl =>{
-      let url = baseUrl.split('"')[0]; 
+      let url = baseUrl.split('"')[0];
       tempUrls.push(url)
     });
-  
+
     const urlDecoded = [];
     tempUrls.map(url =>{
       let urlFixed = decodeURL(url).toString().split('?s=')[1]
@@ -155,7 +155,7 @@ const getAnimeInfo = async(id , title) =>{
         return characters || null
       })
     })));
-    
+
   }catch(err){
     console.log(err)
   }
@@ -174,7 +174,7 @@ const getAnimeVideoPromo = async(title) =>{
   const data = await cloudscraper.get(jikanCharactersURL);
   const body = JSON.parse(data).promo;
   const promises = [];
-  
+
   body.map(doc =>{
     promises.push({
       title: doc.title,
@@ -227,7 +227,7 @@ const getAnimeCharacters = async(title) =>{
       }
     });
   });
-  
+
   return Promise.all(characters);
 };
 
@@ -478,7 +478,7 @@ const latestEpisodesAdded = async() =>{
     promises.push(getAnimeServers(id).then(async servers => ({
       id: id || null,
       title: title || null,
-      poster: await imageUrlToBase64(poster) || null,
+      poster: poster || null,
       episode: episode || null,
       servers: servers || null,
     })))
@@ -528,7 +528,7 @@ const animeEpisodesHandler = async(id) =>{
     const animeExtraInfo = [];
     const genres = [];
     let listByEps;
-    
+
     let animeTitle = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container h2.Title').text();
     let poster = `${BASE_URL}` + $('body div div div div div aside div.AnimeCover div.Image figure img').attr('src')
     const banner = poster.replace('covers' , 'banners').trim();
@@ -536,8 +536,8 @@ const animeEpisodesHandler = async(id) =>{
     let rating = $('body div div div.Ficha.fchlt div.Container div.vtshr div.Votes span#votes_prmd').text();
     const debut = $('body div.Wrapper div.Body div div.Container div.BX.Row.BFluid.Sp20 aside.SidebarA.BFixed p.AnmStts').text();
     const type = $('body div.Wrapper div.Body div div.Ficha.fchlt div.Container span.Type').text()
-    
-    
+
+
     animeExtraInfo.push({
       title: animeTitle,
       poster: poster,
@@ -547,14 +547,14 @@ const animeEpisodesHandler = async(id) =>{
       debut: debut,
       type: type,
     })
-    
+
     $('main.Main section.WdgtCn nav.Nvgnrs a').each((index , element) =>{
       const $element = $(element);
       const genre = $element.attr('href').split('=')[1] || null;
       genres.push(genre);
     });
 
-  
+
     Array.from({length: scripts.length} , (v , k) =>{
       const $script = $(scripts[k]);
       const contents = $script.html();
@@ -595,7 +595,7 @@ const animeEpisodesHandler = async(id) =>{
 
     listByEps = animeListEps;
 
-    return {listByEps , genres , animeExtraInfo};  
+    return {listByEps , genres , animeExtraInfo};
   }catch(err){
     console.error(err)
   }
@@ -612,7 +612,7 @@ const getAnimeServers = async(id) =>{
   const $ = cheerio.load(body);
   const scripts = $('script');
   const servers = [];
-  
+
   Array.from({length: scripts.length} , (v , k) =>{
     const $script = $(scripts[k]);
     const contents = $script.html();
